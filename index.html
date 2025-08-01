@@ -1,0 +1,66 @@
+<html>
+  <head>
+    <title>that's a lot of fonts</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: large;
+        min-height: 100vh;
+      }
+
+      #activate-button {
+        font-size: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="activate-button">Activate</button>
+    <div id="font-list"></div>
+    <script type="text/javascript">
+      (function () {
+        const button = document.getElementById("activate-button");
+
+        async function printFonts() {
+          const element = document.getElementById("font-list");
+
+          if (!("queryLocalFonts" in window)) {
+            console.error(
+              "queryLocalFonts API is not supported in this browser."
+            );
+            element.innerHTML =
+              "queryLocalFonts API is not supported in this browser.";
+            return;
+          }
+
+          try {
+            const availableFonts = await window.queryLocalFonts();
+            const fontFragment = document.createDocumentFragment();
+
+            const countDiv = document.createElement("div");
+            countDiv.textContent = `${availableFonts.length} fonts`;
+            fontFragment.appendChild(countDiv);
+
+            availableFonts.forEach((fontData) => {
+              const fontDiv = document.createElement("div");
+              fontDiv.textContent = `${fontData.postscriptName}`;
+              fontDiv.style.fontFamily = fontData.postscriptName;
+              fontFragment.appendChild(fontDiv);
+            });
+            element.appendChild(fontFragment);
+            button.remove();
+          } catch (err) {
+            console.error(err);
+            element.innerHTML = "Error retrieving fonts: " + err.message;
+          }
+        }
+
+        button.addEventListener("click", printFonts);
+      })();
+    </script>
+  </body>
+</html>
